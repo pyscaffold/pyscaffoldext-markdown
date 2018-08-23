@@ -3,7 +3,7 @@ pyscaffoldext-markdown
 
 WORK-IN-PROGRESS
 
-PyScaffold extension which replaces [reStructuredText][] by [Markdown][]
+PyScaffold extension which replaces [reStructuredText][rst] by [Markdown][md]
 
 Usage
 -----
@@ -19,5 +19,5 @@ Note
 This project has been set up using PyScaffold 3.1rc1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
 
-[reStructuredText]: http://docutils.sourceforge.net/rst.html
-[Markdown]: https://daringfireball.net/projects/markdown/
+[rst]: http://docutils.sourceforge.net/rst.html
+[md]: https://daringfireball.net/projects/markdown/
