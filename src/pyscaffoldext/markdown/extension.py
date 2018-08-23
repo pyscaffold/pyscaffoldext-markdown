@@ -14,6 +14,7 @@ __license__ = "mit"
 
 
 # ToDo: Write actual logic
+# ToDo: Add long_description_content_type = text/markdown to setup.cfg
 class Markdown(Extension):
     """Replace reStructuredText by Markdown"""
     def activate(self, actions):

@@ -8,8 +8,8 @@ PyScaffold extension which replaces [reStructuredText] by [Markdown]
 
 Just install this package with ``pip install pyscaffoldext-markdown``
 and note that ``putup -h`` shows a new option ``--markdown``.
-Basically you will have all `.rst` files will be `.md` files and
-Sphinx is automatically configured to use Markdown.
+Basically this extension will replace all `.rst` files with `.md` files and
+Sphinx is configured to use Markdown by default.
 
 ## Note
 
