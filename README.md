@@ -3,7 +3,7 @@ pyscaffoldext-markdown
 
 WORK-IN-PROGRESS
 
-PyScaffold extension which replaces [reStructuredText] by [Markdown]
+PyScaffold extension which replaces [reStructuredText][] by [Markdown][]
 
 Usage
 -----
