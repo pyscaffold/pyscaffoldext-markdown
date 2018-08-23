@@ -14,8 +14,9 @@ __license__ = "mit"
 
 
 # ToDo: Write actual logic
-# ToDo: Add long_description_content_type = text/markdown to setup.cfg
+# ToDo: Add long-description-content-type = text/markdown to setup.cfg
 # ToDo: Change long_description to Readme.md
+# ToDo: Make sure that wheel>=31 is installed and warn about using twine
 class Markdown(Extension):
     """Replace reStructuredText by Markdown"""
     def activate(self, actions):
