@@ -1,17 +1,18 @@
 # pyscaffoldext-markdown
 
-WORK-IN-PROGRESS
-
-PyScaffold extension which replaces [reStructuredText] by [Markdown].
+PyScaffold extension which replaces [reStructuredText] formatted files 
+by [Markdown] format except for Sphinx-related files.
 
 ## Usage
 
 Just install this package with `pip install pyscaffoldext-markdown`
 and note that `putup -h` shows a new option `--markdown`.
-Basically this extension will replace all `.rst` files with `.md` files and
-Sphinx is configured to use Markdown by default.
+Basically this extension will replace all `README.rst` by `README.md`. 
+The support of Markdown files in Sphinx will be activated.
+Due to limitations of the Markdown syntax compared to reStructuredText, 
+the main documentation files still use reStructuredText by default.
 
-Remember to install [wheel] version 31 or higher and use [twine] to upload your
+Remember to install [wheel] version 0.31 or higher and use [twine] to upload your
 package to [PyPI] instead of `python setup.py release` for this to work, i.e.:
 ```commandline
 python setup.py sdist bdist_wheel
