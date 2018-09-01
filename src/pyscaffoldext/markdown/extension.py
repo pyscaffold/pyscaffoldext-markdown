@@ -58,20 +58,34 @@ class MarkDown(Extension):
             self.markdown,
             after='define_structure')
 
-    def add_long_desc(self, content):
+    @staticmethod
+    def add_long_desc(content):
         updater = ConfigUpdater()
         updater.read_string(content)
         (updater['metadata']['long-description'].add_after
             .option('long-description-content-type', 'text/markdown'))
         return str(updater)
 
-    def add_sphinx_md(self, content):
+    @staticmethod
+    def add_sphinx_md(content):
         content = content.split(os.linesep)
         idx = [i for i, line in enumerate(content)
                if line.startswith('source_suffix =')][0]
         content[idx] = "source_suffix = ['.rst', '.md']"
         content.insert(idx-1, SRC_PARSERS)
         return os.linesep.join(content)
+
+    @staticmethod
+    def rst2md(x):
+        """Convert include file from rst to md
+
+        Args:
+            x (str): content of rst file
+
+        Returns:
+            str: content of rst file
+        """
+        return re.sub(r'(\.\. include:: \.\..+)\.(rst)', r'\1.md', x)
 
     def markdown(self, struct, opts):
         """Convert all rst files to proper md and activate Sphinx md
@@ -95,40 +109,14 @@ class MarkDown(Extension):
             file_path = [opts['project'], "{}.md".format(file)]
             struct = helpers.ensure(struct, file_path, template(opts))
 
-        root = struct[opts['project']]
-        root['setup.cfg'] = mod_content(root['setup.cfg'], self.add_long_desc)
+        file_path = [opts['project'], 'setup.cfg']
+        struct = helpers.modify(struct, file_path, self.add_long_desc)
 
-        docs = root['docs']
         # use when docutils issue is fixed, see #1
         # for file in ('authors.rst', 'changelog.rst'):
-        #    docs[file] = mod_content(docs[file], rst2md)
-        docs['conf.py'] = self.add_sphinx_md(docs['conf.py'])
+        #    file_path = [opts['project'], 'docs', file]
+        #    struct = helpers.modify(struct, file_path, self.rst2md)
+        file_path = [opts['project'], 'docs', 'conf.py']
+        struct = helpers.modify(struct, file_path, self.add_sphinx_md)
 
         return struct, opts
-
-
-def mod_content(value, func):
-    """Modifies content of structure value
-    Args:
-        value: tuple or str from project structure
-
-    Returns:
-        tuple or str for project structure
-    """
-    if isinstance(value, (tuple, list)):
-        content, rule = value
-    else:
-        content, rule = value, None
-    return func(content), rule
-
-
-def rst2md(x):
-    """Convert include file from rst to md
-
-    Args:
-        x (str): content of rst file
-
-    Returns:
-        str: content of rst file
-    """
-    return re.sub(r'(\.\. include:: \.\..+)\.(rst)', r'\1.md', x)
