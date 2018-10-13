@@ -15,6 +15,8 @@ __author__ = "Florian Wilhelm"
 __copyright__ = "Florian Wilhelm"
 __license__ = "mit"
 
+# Use LINESEP instead of os.linesep since '\n' is used in templates
+LINESEP = '\n'
 
 SRC_PARSERS = """
 # To configure AutoStructify
@@ -68,12 +70,12 @@ class MarkDown(Extension):
 
     @staticmethod
     def add_sphinx_md(content):
-        content = content.split(os.linesep)
+        content = content.split(LINESEP)
         idx = [i for i, line in enumerate(content)
                if line.startswith('source_suffix =')][0]
         content[idx] = "source_suffix = ['.rst', '.md']"
         content.insert(idx-1, SRC_PARSERS)
-        return os.linesep.join(content)
+        return LINESEP.join(content)
 
     @staticmethod
     def rst2md(x):
