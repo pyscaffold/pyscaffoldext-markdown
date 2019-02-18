@@ -2,14 +2,13 @@
 """
 Extensions that replaces reStructuredText by Markdown
 """
-import os
 import re
 
 from pyscaffold.api import Extension
 from pyscaffold.api import helpers
 from pyscaffold.contrib.configupdater import ConfigUpdater
 
-from .templates import readme, authors, changelog
+from .templates import readme  # , authors, changelog
 
 __author__ = "Florian Wilhelm"
 __copyright__ = "Florian Wilhelm"
@@ -56,14 +55,17 @@ class MarkDown(Extension):
         return self.register(
             actions,
             self.markdown,
-            after='define_structure')
+            before='verify_project_dir')
 
     @staticmethod
     def add_long_desc(content):
         updater = ConfigUpdater()
         updater.read_string(content)
-        (updater['metadata']['long-description'].add_after
-            .option('long-description-content-type', 'text/markdown'))
+        metadata = updater['metadata']
+        long_desc_type = 'long-description-content-type'
+        if long_desc_type not in metadata:
+            (metadata['long-description'].add_after
+                .option(long_desc_type, 'text/markdown'))
         return str(updater)
 
     @staticmethod
