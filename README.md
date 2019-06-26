@@ -11,7 +11,7 @@ Just install this package with `pip install pyscaffoldext-markdown`
 and note that `putup -h` shows a new option `--markdown`.
 Basically this extension will replace `README.rst` by a proper `README.md` and
 activate the support of Markdown files in Sphinx.
-Due to limitations of the Markdown syntax compared to reStructuredText, 
+Due to limitations of the Markdown syntax compared to reStructuredText,
 the main documentation files still use reStructuredText by default.
 
 Remember to install [wheel] version 0.31 or higher and use [twine] to upload your
