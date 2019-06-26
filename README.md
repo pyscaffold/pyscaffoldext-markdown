@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pyscaffold/pyscaffoldext-markdown.svg?branch=master)](https://travis-ci.org/pyscaffold/pyscaffoldext-markdown)
+
 # pyscaffoldext-markdown
 
 PyScaffold extension which replaces [reStructuredText] formatted files 
