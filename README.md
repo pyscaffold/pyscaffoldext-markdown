@@ -2,7 +2,7 @@
 
 # pyscaffoldext-markdown
 
-PyScaffold extension which replaces [reStructuredText] formatted files 
+PyScaffold extension which replaces [reStructuredText] formatted files
 by [Markdown] format except for Sphinx-related files.
 
 ## Usage
