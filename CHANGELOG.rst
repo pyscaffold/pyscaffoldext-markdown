@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.1
+=============
+
+- Some cosmetics
+
 Version 0.3
 ===========
 
