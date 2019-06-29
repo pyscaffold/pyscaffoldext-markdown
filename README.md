@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/pyscaffold/pyscaffoldext-markdown.svg?branch=master)](https://travis-ci.org/pyscaffold/pyscaffoldext-markdown)
+[![Coveralls](https://img.shields.io/coveralls/github/pyscaffold/pyscaffoldext-pyproject/master.svg)](https://coveralls.io/r/pyscaffold/pyscaffoldext-pyproject)
+[![PyPI-Server](https://img.shields.io/pypi/v/pyscaffoldext-pyproject.svg)](https://pypi.org/project/pyscaffoldext-pyproject)
 
 # pyscaffoldext-markdown
 
