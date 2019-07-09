@@ -15,23 +15,17 @@ __copyright__ = "Florian Wilhelm"
 __license__ = "mit"
 
 
-SRC_PARSERS = """
+AUTO_STRUCTIFY_CONF = """
 # To configure AutoStructify
 def setup(app):
     from recommonmark.transform import AutoStructify
     app.add_config_value('recommonmark_config', {
         'auto_toc_tree_section': 'Contents',
         'enable_eval_rst': True,
-        'enable_auto_doc_ref': True,
         'enable_math': True,
         'enable_inline_math': True
     }, True)
     app.add_transform(AutoStructify)
-
-# Additional parsers besides rst
-source_parsers = {
-   '.md': 'recommonmark.parser.CommonMarkParser',
-}
 """
 
 
@@ -71,10 +65,18 @@ class MarkDown(Extension):
     @staticmethod
     def add_sphinx_md(content):
         content = content.splitlines()
+        # add AutoStructify configuration
         idx = [i for i, line in enumerate(content)
                if line.startswith('source_suffix =')][0]
         content[idx] = "source_suffix = ['.rst', '.md']"
-        content.insert(idx-1, SRC_PARSERS)
+        content.insert(idx - 1, AUTO_STRUCTIFY_CONF)
+        # add recommonmark extension
+        ext_start = [i for i, line in enumerate(content)
+                     if line.startswith('extensions =')][0]
+        idx = [i for i, line in enumerate(content[ext_start:])
+               if line.endswith("']")][0]
+        content.insert(ext_start + idx + 1,
+                       "extensions.append('recommonmark')")
         return '\n'.join(content)
 
     @staticmethod

@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.3.2
+=============
+
+- Remove deprecated ``enable_auto_doc_ref`` option
+- Remove deprecated ``source_parsers``
+
 Version 0.3.1
 =============
 
