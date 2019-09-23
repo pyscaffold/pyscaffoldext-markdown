@@ -56,10 +56,14 @@ class MarkDown(Extension):
         updater = ConfigUpdater()
         updater.read_string(content)
         metadata = updater['metadata']
+        metadata['long-description'].value = 'file: README.md'
         long_desc_type = 'long-description-content-type'
+        long_desc_value = 'text/markdown; charset=UTF-8; variant=GFM'
         if long_desc_type not in metadata:
             (metadata['long-description'].add_after
-                .option(long_desc_type, 'text/markdown'))
+                .option(long_desc_type, long_desc_value))
+        else:
+            metadata[long_desc_type].value = long_desc_value
         return str(updater)
 
     @staticmethod
