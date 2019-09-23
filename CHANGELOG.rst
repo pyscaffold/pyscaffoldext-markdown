@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.3
+=============
+
+- Fix wrong ``long-description`` in ``setup.cfg``
+
 Version 0.3.2
 =============
 
