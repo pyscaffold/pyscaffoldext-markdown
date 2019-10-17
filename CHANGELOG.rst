@@ -2,14 +2,10 @@
 Changelog
 =========
 
-Version 0.3.3
-=============
-
-- Fix wrong ``long-description`` in ``setup.cfg``
-
 Version 0.3.2
 =============
 
+- Fix wrong ``long-description`` in ``setup.cfg``
 - Remove deprecated ``enable_auto_doc_ref`` option
 - Remove deprecated ``source_parsers``
 

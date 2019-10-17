@@ -4,8 +4,7 @@ Extensions that replaces reStructuredText by Markdown
 """
 import re
 
-from pyscaffold.api import Extension
-from pyscaffold.api import helpers
+from pyscaffold.api import Extension, helpers
 from pyscaffold.contrib.configupdater import ConfigUpdater
 
 from .templates import readme  # , authors, changelog
