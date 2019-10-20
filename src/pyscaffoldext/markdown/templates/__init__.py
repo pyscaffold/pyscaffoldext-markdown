@@ -2,23 +2,7 @@
 """
 Templates for all files this extension provides
 """
-import string
-from pkg_resources import resource_string
-
-
-def get_template(name):
-    """Retrieve the template by name
-
-    Args:
-        name: name of template
-
-    Returns:
-        :obj:`string.Template`: template
-    """
-    file_name = "{name}.template".format(name=name)
-    data = resource_string("pyscaffoldext.markdown.templates",
-                           file_name)
-    return string.Template(data.decode("UTF-8"))
+from pyscaffold.templates import get_template
 
 
 def readme(opts):
