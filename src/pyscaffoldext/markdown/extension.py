@@ -30,11 +30,13 @@ def setup(app):
 
 class MarkDown(Extension):
     """Replace reStructuredText by Markdown"""
-    CONV_FILES = {"README": readme,
-                  # Use when docutils issue is fixed, see #1
-                  # "AUTHORS": authors,
-                  # "CHANGELOG": changelog
-                  }
+
+    CONV_FILES = {
+        "README": readme,
+        # Use when docutils issue is fixed, see #1
+        # "AUTHORS": authors,
+        # "CHANGELOG": changelog
+    }
 
     def activate(self, actions):
         """Activate extension
@@ -45,22 +47,22 @@ class MarkDown(Extension):
         Returns:
             list: updated list of actions
         """
-        return self.register(
-            actions,
-            self.markdown,
-            before='verify_project_dir')
+        return self.register(actions, self.markdown, before="verify_project_dir")
 
     @staticmethod
     def add_long_desc(content):
         updater = ConfigUpdater()
         updater.read_string(content)
-        metadata = updater['metadata']
-        metadata['long-description'].value = 'file: README.md'
-        long_desc_type = 'long-description-content-type'
-        long_desc_value = 'text/markdown; charset=UTF-8; variant=GFM'
+        metadata = updater["metadata"]
+        metadata["long-description"].value = "file: README.md"
+        long_desc_type = "long-description-content-type"
+        long_desc_value = "text/markdown; charset=UTF-8; variant=GFM"
         if long_desc_type not in metadata:
-            (metadata['long-description'].add_after
-                .option(long_desc_type, long_desc_value))
+            (
+                metadata["long-description"].add_after.option(
+                    long_desc_type, long_desc_value
+                )
+            )
         else:
             metadata[long_desc_type].value = long_desc_value
         return str(updater)
@@ -69,18 +71,20 @@ class MarkDown(Extension):
     def add_sphinx_md(content):
         content = content.splitlines()
         # add AutoStructify configuration
-        idx = [i for i, line in enumerate(content)
-               if line.startswith('source_suffix =')][0]
+        idx = [
+            i for i, line in enumerate(content) if line.startswith("source_suffix =")
+        ][0]
         content[idx] = "source_suffix = ['.rst', '.md']"
         content.insert(idx - 1, AUTO_STRUCTIFY_CONF)
         # add recommonmark extension
-        ext_start = [i for i, line in enumerate(content)
-                     if line.startswith('extensions =')][0]
-        idx = [i for i, line in enumerate(content[ext_start:])
-               if line.endswith("']")][0]
-        content.insert(ext_start + idx + 1,
-                       "extensions.append('recommonmark')")
-        return '\n'.join(content)
+        ext_start = [
+            i for i, line in enumerate(content) if line.startswith("extensions =")
+        ][0]
+        idx = [i for i, line in enumerate(content[ext_start:]) if line.endswith("']")][
+            0
+        ]
+        content.insert(ext_start + idx + 1, "extensions.append('recommonmark')")
+        return "\n".join(content)
 
     @staticmethod
     def rst2md(x):
@@ -92,7 +96,7 @@ class MarkDown(Extension):
         Returns:
             str: content of rst file
         """
-        return re.sub(r'(\.\. include:: \.\..+)\.(rst)', r'\1.md', x)
+        return re.sub(r"(\.\. include:: \.\..+)\.(rst)", r"\1.md", x)
 
     def markdown(self, struct, opts):
         """Convert all rst files to proper md and activate Sphinx md
@@ -106,24 +110,24 @@ class MarkDown(Extension):
         Returns:
             struct, opts: updated project representation and options
         """
-        if opts['update'] and not opts['force']:
+        if opts["update"] and not opts["force"]:
             return struct, opts
         for file, template in self.CONV_FILES.items():
             # remove rst file
-            file_path = [opts['project'], "{}.rst".format(file)]
+            file_path = [opts["project"], "{}.rst".format(file)]
             struct = helpers.reject(struct, file_path)
             # add md file
-            file_path = [opts['project'], "{}.md".format(file)]
+            file_path = [opts["project"], "{}.md".format(file)]
             struct = helpers.ensure(struct, file_path, template(opts))
 
-        file_path = [opts['project'], 'setup.cfg']
+        file_path = [opts["project"], "setup.cfg"]
         struct = helpers.modify(struct, file_path, self.add_long_desc)
 
         # use when docutils issue is fixed, see #1
         # for file in ('authors.rst', 'changelog.rst'):
         #    file_path = [opts['project'], 'docs', file]
         #    struct = helpers.modify(struct, file_path, self.rst2md)
-        file_path = [opts['project'], 'docs', 'conf.py']
+        file_path = [opts["project"], "docs", "conf.py"]
         struct = helpers.modify(struct, file_path, self.add_sphinx_md)
 
         return struct, opts
