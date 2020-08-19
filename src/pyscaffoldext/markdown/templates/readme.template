@@ -8,6 +8,8 @@ ${description}
 A longer description of your project goes here...
 
 
+<!-- pyscaffold-notes -->
+
 ## Note
 
 This project has been set up using PyScaffold ${version}. For details and usage

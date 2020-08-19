@@ -23,6 +23,8 @@ python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
 
+<!-- pyscaffold-notes -->
+
 ## Making Changes & Contributing
 
 This project uses [pre-commit], please make sure to install it before making any
