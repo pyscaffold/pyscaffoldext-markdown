@@ -81,7 +81,7 @@ def run(*args, **kwargs):
 
 
 def run_common_tasks(tests=True, docs=True, pre_commit=True, install=True):
-    # Requires tox, setuptools_scm and pre-commit in setup.cfg ::
+    # Requires tox, setuptools_scm, twine and pre-commit in setup.cfg ::
     # opts.extras_require.testing
     if tests:
         run(f"{PYTHON} -m tox")
@@ -92,11 +92,19 @@ def run_common_tasks(tests=True, docs=True, pre_commit=True, install=True):
 
     run(f"{PYTHON} setup.py --version")
 
+    twine = get_executable("twine")
+    assert twine, "Twine should be installed as a test dependency"
+    run(twine, "check", *wheels)  # <- checks if README satisfies PyPI policies
+
     if docs:
         run(f"{PYTHON} -m tox -e docs,doctests")
 
     if pre_commit:
-        run(f"{PYTHON} -m pre_commit run --all-files")
+        try:
+            run(f"{PYTHON} -m pre_commit run --all-files")
+        except CalledProcessError:
+            print(run(get_executable("git"), "diff"))
+            raise
 
     if install:
         assert Path(".venv").exists(), "Please use --venv when generating the project"
