@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Version 0.4 (development)
+=========================
+
+- Changes required for PyScaffold v4.0
+- Updated system tests/CI using ``pyscaffoldext-custom-extension``
+- Simplified templates package thanks to ``pyscaffold.templates.get_template``
+- Removed unnecessary ``coding: utf-8`` comments
+
 Version 0.3.2
 =============
 
