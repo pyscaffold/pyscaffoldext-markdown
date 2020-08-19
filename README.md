@@ -23,6 +23,26 @@ python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
 
+## Making Changes & Contributing
+
+This project uses [pre-commit], please make sure to install it before making any
+changes:
+
+```commandline
+pip install pre-commit
+cd pyscaffoldext-markdown
+pre-commit install
+```
+
+It is a good idea to update the hooks to the latest version:
+
+```commandline
+pre-commit autoupdate
+```
+
+Please also check PyScaffold's [contribution guidelines].
+
+
 ## Note
 
 This project has been set up using PyScaffold 3.2. For details and usage
@@ -33,3 +53,5 @@ information on PyScaffold see https://pyscaffold.org/.
 [twine]: https://twine.readthedocs.io/
 [PyPI]: https://pypi.org/
 [wheel]: https://wheel.readthedocs.io/
+[pre-commit]: http://pre-commit.com/
+[contribution guidelines]: https://pyscaffold.org/en/latest/contributing.html
