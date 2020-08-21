@@ -122,9 +122,6 @@ def convert_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     """Convert all rst files to proper md and activate Sphinx md.
     See :obj:`pyscaffold.actions.Action`
     """
-    if opts["update"] and not opts["force"]:
-        return struct, opts
-
     struct = struct.copy()
     for file, template_name in CONV_FILES.items():
         # remove rst file
