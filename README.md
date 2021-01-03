@@ -1,6 +1,8 @@
 [![Build Status](https://api.cirrus-ci.com/github/pyscaffold/pyscaffoldext-markdown.svg?branch=master)](https://cirrus-ci.com/github/pyscaffold/pyscaffoldext-markdown)
 [![Coveralls](https://img.shields.io/coveralls/github/pyscaffold/pyscaffoldext-markdown/master.svg)](https://coveralls.io/r/pyscaffold/pyscaffoldext-markdown)
 [![PyPI-Server](https://img.shields.io/pypi/v/pyscaffoldext-markdown.svg)](https://pypi.org/project/pyscaffoldext-markdown)
+[![Downloads](https://pepy.tech/badge/pyscaffoldext-markdown/month)](https://pepy.tech/project/pyscaffoldext-markdown)
+
 
 # pyscaffoldext-markdown
 
