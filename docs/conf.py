@@ -87,16 +87,24 @@ templates_path = ["_templates"]
 # To configure AutoStructify
 def setup(app):
     from recommonmark.transform import AutoStructify
+    from m2r import MdInclude, convert
 
     params = {
         "auto_toc_tree_section": "Contents",
         "enable_eval_rst": True,
-        "enable_auto_doc_ref": True,
+        # "enable_auto_doc_ref": True,
         "enable_math": True,
         "enable_inline_math": True,
     }
     app.add_config_value("recommonmark_config", params, True)
     app.add_transform(AutoStructify)
+
+    # from m2r to make `mdinclude` work
+    app.add_config_value('no_underscore_emphasis', False, 'env')
+    app.add_config_value('m2r_parse_relative_links', False, 'env')
+    app.add_config_value('m2r_anonymous_references', False, 'env')
+    app.add_config_value('m2r_disable_inline_math', False, 'env')
+    app.add_directive('mdinclude', MdInclude)
 
 
 # Additional parsers besides rst
@@ -166,7 +174,7 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

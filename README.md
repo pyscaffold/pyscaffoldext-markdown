@@ -20,7 +20,7 @@ the main documentation files still use reStructuredText by default.
 
 Remember to install [wheel] version 0.31 or higher and use [twine] to upload your
 package to [PyPI] instead of `python setup.py release` for this to work, e.g.:
-```commandline
+```bash
 python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
@@ -32,7 +32,7 @@ twine upload dist/*
 This project uses [pre-commit], please make sure to install it before making any
 changes:
 
-```commandline
+```bash
 pip install pre-commit
 cd pyscaffoldext-markdown
 pre-commit install
@@ -40,7 +40,7 @@ pre-commit install
 
 It is a good idea to update the hooks to the latest version:
 
-```commandline
+```bash
 pre-commit autoupdate
 ```
 
