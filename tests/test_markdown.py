@@ -4,7 +4,7 @@ import pytest
 from pyscaffold import __version__ as pyscaffold_version
 from pyscaffold import api, cli
 
-from pyscaffoldext.markdown.extension import Markdown
+from pyscaffoldext.markdown.extension import DOC_REQUIREMENTS, Markdown
 
 CONV_FILES = [
     "README",
@@ -33,16 +33,21 @@ def test_create_project_with_markdown(tmpfolder):
     api.create_project(opts)
     assert (tmpfolder / "proj/docs").is_dir()
 
-    # then markdown files should exist
+    # then markdown files should exist,
     for file in CONV_FILES:
         assert (tmpfolder / f"proj/{file}.md").exists()
         assert not (tmpfolder / f"proj/{file}.rst").exists()
 
-    # and the content-type of README should be changed accordingly
+    # the content-type of README should be changed accordingly,
     existing_setup = (tmpfolder / "proj/setup.cfg").read_text()
     cfg = ConfigParser()
     cfg.read_string(existing_setup)
     assert "text/markdown" in str(cfg["metadata"]["long-description-content-type"])
+
+    # and new doc requirements should be added to docs/requirements.txt
+    requirements_txt = (tmpfolder / "proj/docs/requirements.txt").read_text()
+    for req in DOC_REQUIREMENTS:
+        assert req in requirements_txt
 
 
 @pytest.mark.slow
