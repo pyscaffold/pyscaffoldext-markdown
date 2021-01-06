@@ -11,7 +11,7 @@ CONV_FILES = [
     "AUTHORS",
     "CHANGELOG",
     "docs/index",
-    "docs/readme",
+    # "docs/readme",
     "docs/authors",
     "docs/changelog",
 ]
@@ -31,6 +31,7 @@ def test_create_project_with_markdown(tmpfolder):
 
     # when the project is created,
     api.create_project(opts)
+    assert (tmpfolder / "proj/docs").is_dir()
 
     # then markdown files should exist
     for file in CONV_FILES:
@@ -38,7 +39,7 @@ def test_create_project_with_markdown(tmpfolder):
         assert not (tmpfolder / f"proj/{file}.rst").exists()
 
     # and the content-type of README should be changed accordingly
-    existing_setup = (tmpfolder / "proj" / "setup.cfg").read_text()
+    existing_setup = (tmpfolder / "proj/setup.cfg").read_text()
     cfg = ConfigParser()
     cfg.read_string(existing_setup)
     assert "text/markdown" in str(cfg["metadata"]["long-description-content-type"])
