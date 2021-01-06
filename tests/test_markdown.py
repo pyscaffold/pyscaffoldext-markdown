@@ -4,7 +4,17 @@ import pytest
 from pyscaffold import __version__ as pyscaffold_version
 from pyscaffold import api, cli
 
-from pyscaffoldext.markdown.extension import CONV_FILES, Markdown
+from pyscaffoldext.markdown.extension import Markdown
+
+CONV_FILES = [
+    "README",
+    "AUTHORS",
+    "CHANGELOG",
+    "docs/index",
+    "docs/readme",
+    "docs/authors",
+    "docs/changelog",
+]
 
 
 @pytest.mark.slow
