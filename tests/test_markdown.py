@@ -11,7 +11,7 @@ CONV_FILES = [
     "AUTHORS",
     "CHANGELOG",
     "docs/index",
-    # "docs/readme",
+    "docs/readme",
     "docs/authors",
     "docs/changelog",
 ]
