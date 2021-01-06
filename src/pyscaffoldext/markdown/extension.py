@@ -1,12 +1,13 @@
 """Extension that replaces reStructuredText by Markdown"""
+import os
 from functools import partial, reduce
 from pathlib import Path
 from typing import List
 
 from configupdater import ConfigUpdater
+from pyscaffold import file_system as fs
 from pyscaffold.actions import Action, ActionParams, ScaffoldOpts, Structure
 from pyscaffold.extensions import Extension
-from pyscaffold.file_system import PathLike
 from pyscaffold.log import logger
 from pyscaffold.operations import FileContents, FileOp, no_overwrite
 from pyscaffold.structure import merge, reify_leaf, reject
@@ -108,6 +109,12 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         "docs/changelog.rst",
     ]
     struct = reduce(reject, unnecessary, struct)
+    content, file_op = reify_leaf(struct["setup.cfg"], opts)
+    struct["setup.cfg"] = (add_long_desc(content), file_op)
+
+    docs = struct.pop("docs", {})  # see comments on ``files``
+    content, file_op = reify_leaf(docs["conf.py"], opts)
+    root = Path(opts.get("project_path", "."))
 
     # Define replacement files/links
     files: Structure = {
@@ -115,23 +122,23 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         "AUTHORS.md": (template("authors"), no_overwrite()),
         "CHANGELOG.md": (template("changelog"), no_overwrite()),
         "docs": {
-            "readme.md": (None, no_overwrite(symlink("README.md"))),
-            "authors.md": (None, no_overwrite(symlink("AUTHORS.md"))),
-            "changelog.md": (None, no_overwrite(symlink("CHANGELOG.md"))),
+            **docs,
+            # by popping the docs and merging them back we guarantee the '*.md'
+            # files at the root of the repository are processed first, then when it is
+            # time to process the `docs` folder, they already exist and can be symlinked
+            "conf.py": (add_sphinx_md(content), file_op),
+            "index.md": (template("index"), no_overwrite()),
+            "readme.md": (None, no_overwrite(symlink(root / "README.md"))),
+            "authors.md": (None, no_overwrite(symlink(root / "AUTHORS.md"))),
+            "changelog.md": (None, no_overwrite(symlink(root / "CHANGELOG.md"))),
         },
     }
-
-    content, file_op = reify_leaf(struct["setup.cfg"], opts)
-    struct["setup.cfg"] = (add_long_desc(content), file_op)
-
-    content, file_op = reify_leaf(struct["docs"]["conf.py"], opts)
-    struct["docs"]["conf.py"] = (add_sphinx_md(content), file_op)
 
     return merge(struct, files), opts
 
 
-def symlink(original_file: PathLike) -> FileOp:
-    """Returns a file operation that creates a symlink to ``original_file``"""
+def symlink(original_file: fs.PathLike) -> FileOp:
+    """Returns a file operation that creates a symlink to ``original_file``."""
     # TODO: Transfer this function to PyScaffold's core (and split it into 2:
     #       a file_system.symlink and an operations.symlink)
 
@@ -148,11 +155,27 @@ def symlink(original_file: PathLike) -> FileOp:
         if should_pretend:
             return path
 
-        if path.exists() and opts.get("force"):
-            path.unlink()
+        # Since errors in Windows can be tricky, let's print meaningful messages
+        if path.exists():
+            if opts.get("force"):
+                path.unlink()
+            else:
+                raise FileExistsError(
+                    "Impossible to create a symbolic link "
+                    f"{{{path} => {original_file}}}.\n{path} already exist.\n"
+                )
+
+        if not Path(original_file).exists():
+            raise FileNotFoundError(
+                "Impossible to create a symbolic link "
+                f"{{{path} => {original_file}}}: {original_file} does not exist"
+            )
 
         try:
-            path.symlink_to(original_file)
+            # Relative links in Python might be tricky
+            # the following implementation is very difficult to be replaced by something
+            # completely pathlib-based, see https://bugs.python.org/issue37019
+            os.symlink(os.path.relpath(original_file, path.parent), path)
             return path
         except OSError as ex:
             raise SymlinkError(path, original_file) from ex
@@ -163,16 +186,16 @@ def symlink(original_file: PathLike) -> FileOp:
 class SymlinkError(OSError):
     """\
     Impossible to create a symbolic link {{{link_path} => {original_file}}}.
-    If you are using a non-POSIX operating system, please make sure that
-    your user have the correct rights and that your system is corrctly
-    configured.
+    If you are using a non-POSIX operating system, please make sure that your user have
+    the correct rights and that your system is correctly configured.
 
     Please check the following references:
     http://github.com/git-for-windows/git/wiki/Symbolic-Links
-    https://blogs.windows.com/windowsdeveloper/2016/12/02/ symlinks-windows-10/
-    https://docs.microsoft.com/en-us/windows/win32/fileio/ creating-symbolic-links
+    https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/
+    https://docs.microsoft.com/en-us/windows/win32/fileio/creating-symbolic-links
     """
 
     def __init__(self, link_path, original_file, *args, **kwargs):
-        msg = (self.__class__.__doc__ or "").format(original_file, link_path)
+        docs = self.__class__.__doc__ or ""
+        msg = docs.format(original_file=original_file, link_path=link_path)
         super().__init__(msg, *args, **kwargs)
