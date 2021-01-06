@@ -1,13 +1,15 @@
 """Extension that replaces reStructuredText by Markdown"""
-import re
-from functools import partial
+from functools import partial, reduce
+from pathlib import Path
 from typing import List
 
 from configupdater import ConfigUpdater
 from pyscaffold.actions import Action, ActionParams, ScaffoldOpts, Structure
 from pyscaffold.extensions import Extension
-from pyscaffold.operations import no_overwrite
-from pyscaffold.structure import merge, reify_content, resolve_leaf
+from pyscaffold.file_system import PathLike
+from pyscaffold.log import logger
+from pyscaffold.operations import FileContents, FileOp, no_overwrite
+from pyscaffold.structure import merge, reify_leaf, reject
 from pyscaffold.templates import get_template
 
 from . import templates
@@ -16,29 +18,6 @@ __author__ = "Florian Wilhelm"
 __copyright__ = "Florian Wilhelm"
 __license__ = "MIT"
 
-
-AUTO_STRUCTIFY_CONF = """
-# To configure AutoStructify
-def setup(app):
-    from recommonmark.transform import AutoStructify
-
-    params = {
-        "auto_toc_tree_section": "Contents",
-        "enable_eval_rst": True,
-        "enable_auto_doc_ref": True,
-        "enable_math": True,
-        "enable_inline_math": True,
-    }
-    app.add_config_value("recommonmark_config", params, True)
-    app.add_transform(AutoStructify)
-"""
-
-CONV_FILES = {
-    "README": "readme",
-    # Use when docutils issue is fixed, see #1
-    # "AUTHORS": "authors",
-    # "CHANGELOG": "changelog"
-}
 
 DOC_REQUIREMENTS = ["recommonmark"]
 
@@ -51,7 +30,7 @@ class Markdown(Extension):
     def activate(self, actions: List[Action]) -> List[Action]:
         """Activate extension. See :obj:`pyscaffold.extension.Extension.activate`."""
         actions = self.register(actions, add_doc_requirements)
-        return self.register(actions, convert_files, before="verify_project_dir")
+        return self.register(actions, replace_files, before="verify_project_dir")
 
 
 def add_long_desc(content: str) -> str:
@@ -70,14 +49,15 @@ def add_long_desc(content: str) -> str:
 
 def add_sphinx_md(original: str) -> str:
     content = original.splitlines()
+    auto_structify = template("auto_structify").template  # raw string
     # add AutoStructify configuration
     j = next(i for i, line in enumerate(content) if line.startswith("source_suffix ="))
     content[j] = "source_suffix = ['.rst', '.md']"
-    content.insert(j - 1, AUTO_STRUCTIFY_CONF)
+    content.insert(j - 1, auto_structify)
     # add recommonmark extension
     start = next(i for i, line in enumerate(content) if line.startswith("extensions ="))
     j = next(i for i, line in enumerate(content[start:]) if line.endswith("']"))
-    content.insert(start + j + 1, "extensions.append('recommonmark')")
+    content.insert(start + j + 1, 'extensions.append("recommonmark")')
     return "\n".join(content)
 
 
@@ -89,12 +69,11 @@ def add_doc_requirements(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
 
     files: Structure = {
         "docs": {
-            "requirements.txt": ("\n".join(DOC_REQUIREMENTS) + "\n", no_overwrite())
+            "requirements.txt": ("\n".join(DOC_REQUIREMENTS) + "\n", no_overwrite()),
         }
     }
 
-    original, file_op = resolve_leaf(struct.get("tox.ini"))
-    original = reify_content(original, opts)
+    original, file_op = reify_leaf(struct.get("tox.ini"), opts)
     if original:
         content = original.splitlines()
         j = next(i for i, line in enumerate(content) if "docs/requirements.txt" in line)
@@ -106,38 +85,94 @@ def add_doc_requirements(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     return merge(struct, files), opts
 
 
-def rst2md(content: str) -> str:
-    """Convert include file from rst to md
-
-    Args:
-        content: content of rst file
-
-    Returns:
-        content of md file
-    """
-    return re.sub(r"(\.\. include:: \.\..+)\.(rst)", r"\1.md", content)
-
-
-def convert_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
-    """Convert all rst files to proper md and activate Sphinx md.
+def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
+    """Replace all rst files to proper md and activate Sphinx md.
     See :obj:`pyscaffold.actions.Action`
+
+    The approach used by recommonmark's own documentation is to include a symbolic link
+    file inside the docs directory, instead of trying to do a rst's *include*.
+
+    References:
+    - https://github.com/readthedocs/recommonmark/issues/191
+    - https://github.com/sphinx-doc/sphinx/issues/701
+    - https://github.com/sphinx-doc/sphinx/pull/7739
     """
-    struct = struct.copy()
-    for file, template_name in CONV_FILES.items():
-        # remove rst file
-        _, file_op = resolve_leaf(struct.pop(f"{file}.rst"))
-        # add md file
-        struct[f"{file}.md"] = (template(template_name), file_op)
+    # Remove all unnecessary .rst files from struct
+    unnecessary = [
+        "README.rst",
+        "AUTHORS.rst",
+        "CHANGELOG.rst",
+        "docs/index.rst",
+        "docs/readme.rst",
+        "docs/authors.rst",
+        "docs/changelog.rst",
+    ]
+    struct = reduce(reject, unnecessary, struct)
 
-    content, file_op = resolve_leaf(struct["setup.cfg"])
-    struct["setup.cfg"] = (add_long_desc(reify_content(content, opts)), file_op)
+    # Define replacement files/links
+    files: Structure = {
+        "README.md": (template("readme"), no_overwrite()),
+        "AUTHORS.md": (template("authors"), no_overwrite()),
+        "CHANGELOG.md": (template("changelog"), no_overwrite()),
+        "docs": {
+            "readme.md": (None, no_overwrite(symlink("README.md"))),
+            "authors.md": (None, no_overwrite(symlink("AUTHORS.md"))),
+            "changelog.md": (None, no_overwrite(symlink("CHANGELOG.md"))),
+        },
+    }
 
-    # use when docutils issue is fixed, see #1
-    # for file in ("authors", "changelog"):
-    #     content, file_op = resolve_leaf(struct["docs"].pop(f"{file}.rst"))
-    #     struct["docs"][f"{file}.md"] = (rst2md(reify_content(content, opts)), file_op)
+    content, file_op = reify_leaf(struct["setup.cfg"], opts)
+    struct["setup.cfg"] = (add_long_desc(content), file_op)
 
-    content, file_op = resolve_leaf(struct["docs"]["conf.py"])
-    struct["docs"]["conf.py"] = (add_sphinx_md(reify_content(content, opts)), file_op)
+    content, file_op = reify_leaf(struct["docs"]["conf.py"], opts)
+    struct["docs"]["conf.py"] = (add_sphinx_md(content), file_op)
 
-    return struct, opts
+    return merge(struct, files), opts
+
+
+def symlink(original_file: PathLike) -> FileOp:
+    """Returns a file operation that creates a symlink to ``original_file``"""
+    # TODO: Transfer this function to PyScaffold's core (and split it into 2:
+    #       a file_system.symlink and an operations.symlink)
+
+    def _symlink(path: Path, _: FileContents, opts: ScaffoldOpts):
+        """See ``pyscaffoldext.markdown.extension.symlink``"""
+        should_pretend = opts.get("pretend")
+        should_log = opts.get("log", should_pretend)
+        # ^ When pretending, automatically output logs
+        #   (after all, this is the primary purpose of pretending)
+
+        if should_log:
+            logger.report("symlink", path, target=original_file)
+
+        if should_pretend:
+            return path
+
+        if path.exists() and opts.get("force"):
+            path.unlink()
+
+        try:
+            path.symlink_to(original_file)
+            return path
+        except OSError as ex:
+            raise SymlinkError(path, original_file) from ex
+
+    return _symlink
+
+
+class SymlinkError(OSError):
+    """\
+    Impossible to create a symbolic link {{{link_path} => {original_file}}}.
+    If you are using a non-POSIX operating system, please make sure that
+    your user have the correct rights and that your system is corrctly
+    configured.
+
+    Please check the following references:
+    http://github.com/git-for-windows/git/wiki/Symbolic-Links
+    https://blogs.windows.com/windowsdeveloper/2016/12/02/ symlinks-windows-10/
+    https://docs.microsoft.com/en-us/windows/win32/fileio/ creating-symbolic-links
+    """
+
+    def __init__(self, link_path, original_file, *args, **kwargs):
+        msg = (self.__class__.__doc__ or "").format(original_file, link_path)
+        super().__init__(msg, *args, **kwargs)
