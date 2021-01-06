@@ -6,6 +6,7 @@
 - Updated system tests/CI using `pyscaffoldext-custom-extension`
 - Simplified templates package thanks to `pyscaffold.templates.get_template`
 - Removed unnecessary `coding: utf-8` comments
+- Use symlinks to load `README.md`, `AUTHORS.md`, `CHANGELOG.md` into Sphinx, issues #6, #7.
 
 ## Version 0.3.2
 
