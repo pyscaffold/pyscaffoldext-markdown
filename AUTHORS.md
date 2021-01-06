@@ -1,5 +1,4 @@
-============
-Contributors
-============
+# Contributors
 
-* Florian Wilhelm <florian.wilhelm@inovex.de>
+* Florian Wilhelm
+* Anderson Bravalheri
