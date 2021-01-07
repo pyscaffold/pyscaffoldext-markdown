@@ -92,6 +92,9 @@ def add_doc_requirements(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     return merge(struct, files), opts
 
 
+# NOTE: Avoid renaming/removing replace_files.
+#       The dsproject extension depends on that name, any changes in the function
+#       signature here should be followed by a PR to that repository.
 def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     """Replace all rst files to proper md and activate Sphinx md.
     See :obj:`pyscaffold.actions.Action`
