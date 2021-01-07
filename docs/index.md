@@ -6,7 +6,7 @@ by [Markdown] format except for [Sphinx]-related files.
 
 ## Contents
 
-* [Quickstart](readme)
+* [Overview](readme)
 * [License](license)
 * [Authors](authors)
 * [Changelog](changelog)
