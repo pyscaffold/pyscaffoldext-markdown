@@ -48,17 +48,16 @@ def add_long_desc(content: str) -> str:
     return str(updater)
 
 
-def add_sphinx_md(original: str) -> str:
+def add_recommonmark(original: str) -> str:
+    """Change docs/conf.py to use recommonmark and AutoStructify, enabling md files"""
     content = original.splitlines()
     auto_structify = template("auto_structify").template  # raw string
-    # add AutoStructify configuration
+    recommonmark = '\n# Enable markdown\nextensions.append("recommonmark")\n'
+    # add recommonmark extension and AutoStructify configuration
     j = next(i for i, line in enumerate(content) if line.startswith("source_suffix ="))
-    content[j] = "source_suffix = ['.rst', '.md']"
+    content[j] = 'source_suffix = [".rst", ".md"]'
     content.insert(j - 1, auto_structify)
-    # add recommonmark extension
-    start = next(i for i, line in enumerate(content) if line.startswith("extensions ="))
-    j = next(i for i, line in enumerate(content[start:]) if line.endswith("']"))
-    content.insert(start + j + 1, 'extensions.append("recommonmark")')
+    content.insert(j, recommonmark)
     return "\n".join(content)
 
 
@@ -133,7 +132,7 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
             # by popping the docs and merging them back we guarantee the '*.md'
             # files at the root of the repository are processed first, then when it is
             # time to process the `docs` folder, they already exist and can be symlinked
-            "conf.py": (add_sphinx_md(content), file_op),
+            "conf.py": (add_recommonmark(content), file_op),
             "index.md": (template("index"), no_overwrite()),
             "readme.md": (None, no_overwrite(symlink(root / "README.md"))),
             "authors.md": (None, no_overwrite(symlink(root / "AUTHORS.md"))),
