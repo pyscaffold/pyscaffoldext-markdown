@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.4 (development)
+<!-- ## Version 0.4.1 (development) -->
+
+## Version 0.4
 
 - Changes required for PyScaffold v4.0
 - Updated system tests/CI using `pyscaffoldext-custom-extension`
