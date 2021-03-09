@@ -13,8 +13,8 @@ env:
 
 # This template is used in most of the tasks
 .regular_task_template: &REGULAR_TASK_TEMPLATE
-  tox_install_script:
-    - python -m pip install --upgrade pip setuptools tox
+  tools_install_script:
+    - python -m pip install --upgrade pip setuptools tox pre-commit
   prepare_script: &prepare
     # This script is also used in Windows, so the shell is not POSIX
     - git config --global user.email "you@example.com"
