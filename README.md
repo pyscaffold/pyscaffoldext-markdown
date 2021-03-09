@@ -2,6 +2,7 @@
 [![ReadTheDocs](https://readthedocs.org/projects/pyscaffoldext-markdown/badge/?version=latest)](https://pyscaffoldext-markdown.readthedocs.io/)
 [![Coveralls](https://img.shields.io/coveralls/github/pyscaffold/pyscaffoldext-markdown/master.svg)](https://coveralls.io/r/pyscaffold/pyscaffoldext-markdown)
 [![PyPI-Server](https://img.shields.io/pypi/v/pyscaffoldext-markdown.svg)](https://pypi.org/project/pyscaffoldext-markdown)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/pyscaffoldext-markdown.svg)
 [![Downloads](https://pepy.tech/badge/pyscaffoldext-markdown/month)](https://pepy.tech/project/pyscaffoldext-markdown)
 
 
@@ -13,7 +14,7 @@ by [Markdown] format except for [Sphinx]-related files.
 
 ## Usage
 
-Just install this package with `pip install pyscaffoldext-markdown`
+Just install this package with either `pip install pyscaffoldext-markdown` or `conda install -c conda-forge pyscaffoldext-markdown`
 and note that `putup -h` shows a new option `--markdown`.
 Basically this extension will replace `README.rst` by a proper `README.md` and
 activate the support of Markdown files in Sphinx.
@@ -107,5 +108,6 @@ information on PyScaffold see [https://pyscaffold.org/](https://pyscaffold.org/)
 [pipx]: https://pipxproject.github.io/pipx/
 [twine]: https://twine.readthedocs.io/
 [PyPI]: https://pypi.org/
+[Conda-Forge]: https://anaconda.org/conda-forge/pyscaffoldext-markdown
 [pre-commit]: http://pre-commit.com/
 [contribution guidelines]: https://pyscaffold.org/en/latest/contributing.html
