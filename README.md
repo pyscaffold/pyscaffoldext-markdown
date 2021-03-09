@@ -2,7 +2,7 @@
 [![ReadTheDocs](https://readthedocs.org/projects/pyscaffoldext-markdown/badge/?version=latest)](https://pyscaffoldext-markdown.readthedocs.io/)
 [![Coveralls](https://img.shields.io/coveralls/github/pyscaffold/pyscaffoldext-markdown/master.svg)](https://coveralls.io/r/pyscaffold/pyscaffoldext-markdown)
 [![PyPI-Server](https://img.shields.io/pypi/v/pyscaffoldext-markdown.svg)](https://pypi.org/project/pyscaffoldext-markdown)
-[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/pyscaffoldext-markdown.svg)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/pyscaffoldext-markdown.svg)](https://anaconda.org/conda-forge/pyscaffoldext-markdown)
 [![Downloads](https://pepy.tech/badge/pyscaffoldext-markdown/month)](https://pepy.tech/project/pyscaffoldext-markdown)
 
 
