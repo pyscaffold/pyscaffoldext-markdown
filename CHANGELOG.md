@@ -5,6 +5,7 @@
 ## Version 0.4.1 (development)
 
 - Latest updates from PyScaffold
+- Fix issue with kebab-cased-keys in `setup.cfg`, PR #13
 
 ## Version 0.4
 
