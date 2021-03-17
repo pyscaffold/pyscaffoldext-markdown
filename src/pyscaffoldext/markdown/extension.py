@@ -8,6 +8,7 @@ from configupdater import ConfigUpdater
 from pyscaffold import file_system as fs
 from pyscaffold.actions import Action, ActionParams, ScaffoldOpts, Structure
 from pyscaffold.extensions import Extension
+from pyscaffold.identification import dasherize
 from pyscaffold.log import logger
 from pyscaffold.operations import FileContents, FileOp, no_overwrite
 from pyscaffold.structure import merge, reify_leaf, reject
@@ -19,6 +20,8 @@ __author__ = "Florian Wilhelm"
 __copyright__ = "Florian Wilhelm"
 __license__ = "MIT"
 
+DESC_KEY = "long_description"
+TYPE_KEY = "long_description_content_type"
 
 DOC_REQUIREMENTS = ["recommonmark"]
 
@@ -38,13 +41,19 @@ def add_long_desc(content: str) -> str:
     updater = ConfigUpdater()
     updater.read_string(content)
     metadata = updater["metadata"]
-    metadata["long-description"].value = "file: README.md"
-    long_desc_type = "long-description-content-type"
+
+    long_desc = metadata.get(dasherize(DESC_KEY)) or metadata.get(DESC_KEY)
+    long_desc.name = DESC_KEY  # dash-separated keys are deprecated in setuptools
+    long_desc.value = "file: README.md"
     long_desc_value = "text/markdown; charset=UTF-8; variant=GFM"
-    if long_desc_type not in metadata:
-        metadata["long-description"].add_after.option(long_desc_type, long_desc_value)
+
+    long_desc_type = metadata.get(dasherize(TYPE_KEY)) or metadata.get(TYPE_KEY)
+    if long_desc_type:
+        long_desc_type.name = TYPE_KEY
+        long_desc_type.value = long_desc_value
     else:
-        metadata[long_desc_type].value = long_desc_value
+        long_desc.add_after.option(TYPE_KEY, long_desc_value)
+
     return str(updater)
 
 

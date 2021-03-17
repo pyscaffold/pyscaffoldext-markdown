@@ -1,10 +1,11 @@
 from configparser import ConfigParser
+from textwrap import dedent
 
 import pytest
 from pyscaffold import __version__ as pyscaffold_version
 from pyscaffold import api, cli
 
-from pyscaffoldext.markdown.extension import DOC_REQUIREMENTS, Markdown
+from pyscaffoldext.markdown.extension import DOC_REQUIREMENTS, Markdown, add_long_desc
 
 CONV_FILES = [
     "README",
@@ -15,6 +16,42 @@ CONV_FILES = [
     "docs/authors",
     "docs/changelog",
 ]
+
+
+def test_underscore_keys():
+    # Dash-separated keys for setup.cfg were deprecated by setuptools, so it is good to
+    # ensure they don't occur
+    examples = [
+        """\
+        [metadata]
+        long-description: a-pkg
+        long-description-content-type: text/x-rst
+        """,
+        """\
+        [metadata]
+        long_description: a-pkg
+        long_description_content_type: text/x-rst
+        """,
+        """\
+        [metadata]
+        long-description: a-pkg
+        """,
+        """\
+        [metadata]
+        long_description: a-pkg
+        """,
+    ]
+
+    for example in examples:
+        modified = add_long_desc(dedent(example))
+        cfg = ConfigParser()
+        cfg.read_string(modified)
+        options = list(cfg["metadata"].keys())
+        print(modified)
+        assert "long_description" in options
+        assert "long_description_content_type" in options
+        assert "long-description" not in options
+        assert "long-description-content-type" not in options
 
 
 @pytest.mark.slow
@@ -42,7 +79,8 @@ def test_create_project_with_markdown(tmpfolder):
     existing_setup = (tmpfolder / "proj/setup.cfg").read_text()
     cfg = ConfigParser()
     cfg.read_string(existing_setup)
-    assert "text/markdown" in str(cfg["metadata"]["long-description-content-type"])
+    assert "text/markdown" in str(cfg["metadata"]["long_description_content_type"])
+    assert "file: README" in str(cfg["metadata"]["long_description"])
 
     # and new doc requirements should be added to docs/requirements.txt
     requirements_txt = (tmpfolder / "proj/docs/requirements.txt").read_text()
