@@ -43,13 +43,13 @@ def add_long_desc(content: str) -> str:
     metadata = updater["metadata"]
 
     long_desc = metadata.get(dasherize(DESC_KEY)) or metadata.get(DESC_KEY)
-    long_desc.name = DESC_KEY  # dash-separated keys are deprecated in setuptools
+    long_desc.key = DESC_KEY  # dash-separated keys are deprecated in setuptools
     long_desc.value = "file: README.md"
     long_desc_value = "text/markdown; charset=UTF-8; variant=GFM"
 
     long_desc_type = metadata.get(dasherize(TYPE_KEY)) or metadata.get(TYPE_KEY)
     if long_desc_type:
-        long_desc_type.name = TYPE_KEY
+        long_desc_type.key = TYPE_KEY
         long_desc_type.value = long_desc_value
     else:
         long_desc.add_after.option(TYPE_KEY, long_desc_value)
