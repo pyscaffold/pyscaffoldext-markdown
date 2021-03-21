@@ -2,10 +2,11 @@
 
 <!-- ## Version 0.4.2 (development) -->
 
-## Version 0.4.1 (development)
+## Version 0.4.1
 
 - Latest updates from PyScaffold
 - Fix issue with kebab-cased-keys in `setup.cfg`, PR #13
+- Fix issue of dsproject extension `KeyError: 'long-description'`, issue #20
 
 ## Version 0.4
 
