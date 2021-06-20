@@ -78,31 +78,25 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    "recommonmark",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 
-# To configure AutoStructify
-def setup(app):
-    from recommonmark.transform import AutoStructify
+# Enable markdown
+extensions.append("myst_parser")
 
-    params = {
-        "enable_auto_toc_tree": True,
-        "auto_toc_tree_section": "Contents",
-        "auto_toc_maxdepth": 2,
-        "enable_eval_rst": True,
-        "enable_math": True,
-        "enable_inline_math": True,
-    }
-    app.add_config_value("recommonmark_config", params, True)
-    app.add_transform(AutoStructify)
-
-
-# Additional parsers besides rst
-source_parsers = {".md": "recommonmark.parser.CommonMarkParser"}
+# Configure MyST-Parser
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "dollarmath",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+]
 
 # The suffix of source filenames.
 source_suffix = [".rst", ".md"]
