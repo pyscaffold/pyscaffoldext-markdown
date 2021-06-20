@@ -1,16 +1,13 @@
 """Extension that replaces reStructuredText by Markdown"""
-import os
 from functools import partial, reduce
-from pathlib import Path
+from textwrap import dedent
 from typing import List
 
 from configupdater import ConfigUpdater
-from pyscaffold import file_system as fs
 from pyscaffold.actions import Action, ActionParams, ScaffoldOpts, Structure
 from pyscaffold.extensions import Extension
 from pyscaffold.identification import dasherize
-from pyscaffold.log import logger
-from pyscaffold.operations import FileContents, FileOp, no_overwrite
+from pyscaffold.operations import no_overwrite
 from pyscaffold.structure import merge, reify_leaf, reject
 from pyscaffold.templates import get_template
 
@@ -23,7 +20,7 @@ __license__ = "MIT"
 DESC_KEY = "long_description"
 TYPE_KEY = "long_description_content_type"
 
-DOC_REQUIREMENTS = ["recommonmark"]
+DOC_REQUIREMENTS = ["myst-parser[linkify]"]
 
 template = partial(get_template, relative_to=templates)
 
@@ -57,17 +54,33 @@ def add_long_desc(content: str) -> str:
     return str(updater)
 
 
-def add_recommonmark(original: str) -> str:
-    """Change docs/conf.py to use recommonmark and AutoStructify, enabling md files"""
+def add_myst(original: str) -> str:
+    """Change docs/conf.py to use MyST-Parser, enabling md files"""
+    # add myst_parser extension and its own extensions configuration
     content = original.splitlines()
-    auto_structify = template("auto_structify").template  # raw string
-    recommonmark = '\n# Enable markdown\nextensions.append("recommonmark")\n'
-    # add recommonmark extension and AutoStructify configuration
+    myst = '\n# Enable markdown\nextensions.append("myst_parser")\n'
+    myst_extensions = template("myst_extensions").template  # raw string
     j = next(i for i, line in enumerate(content) if line.startswith("source_suffix ="))
     content[j] = 'source_suffix = [".rst", ".md"]'
-    content.insert(j - 1, auto_structify)
-    content.insert(j, recommonmark)
+    content.insert(j - 1, myst)
+    content.insert(j, myst_extensions)
     return "\n".join(content)
+
+
+def default_myst_include(root_file: str) -> str:
+    """Return string which is a MyST include directive pointing to `root_file`,
+    located under `..` relative to `docs`. See:
+    https://myst-parser.readthedocs.io/en/latest/sphinx/use.html#howto-include-readme
+    """
+    template_include = dedent(
+        """\
+        ```{include} ../{root_file}
+        :relative-docs: docs/
+        :relative-images:
+        ```
+        """
+    )
+    return template_include.replace("{root_file}", root_file)
 
 
 def add_doc_requirements(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
@@ -107,14 +120,6 @@ def add_doc_requirements(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
 def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     """Replace all rst files to proper md and activate Sphinx md.
     See :obj:`pyscaffold.actions.Action`
-
-    The approach used by recommonmark's own documentation is to include a symbolic link
-    file inside the docs directory, instead of trying to do a rst's *include*.
-
-    References:
-    - https://github.com/readthedocs/recommonmark/issues/191
-    - https://github.com/sphinx-doc/sphinx/issues/701
-    - https://github.com/sphinx-doc/sphinx/pull/7739
     """
     # Remove all unnecessary .rst files from struct
     unnecessary = [
@@ -123,6 +128,7 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         "CHANGELOG.rst",
         "docs/index.rst",
         "docs/readme.rst",
+        "docs/license.rst",
         "docs/authors.rst",
         "docs/changelog.rst",
     ]
@@ -130,9 +136,7 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     content, file_op = reify_leaf(struct["setup.cfg"], opts)
     struct["setup.cfg"] = (add_long_desc(content), file_op)
 
-    docs = struct.pop("docs", {})  # see comments on ``files``
-    content, file_op = reify_leaf(docs["conf.py"], opts)
-    root = Path(opts.get("project_path", "."))
+    content, file_op = reify_leaf(struct["docs"]["conf.py"], opts)
 
     # Define replacement files/links
     files: Structure = {
@@ -140,15 +144,12 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         "AUTHORS.md": (template("authors"), no_overwrite()),
         "CHANGELOG.md": (template("changelog"), no_overwrite()),
         "docs": {
-            **docs,
-            # by popping the docs and merging them back we guarantee the '*.md'
-            # files at the root of the repository are processed first, then when it is
-            # time to process the `docs` folder, they already exist and can be symlinked
-            "conf.py": (add_recommonmark(content), file_op),
+            "conf.py": (add_myst(content), file_op),
             "index.md": (template("index"), no_overwrite()),
-            "readme.md": (None, no_overwrite(symlink(root / "README.md"))),
-            "authors.md": (None, no_overwrite(symlink(root / "AUTHORS.md"))),
-            "changelog.md": (None, no_overwrite(symlink(root / "CHANGELOG.md"))),
+            "readme.md": (default_myst_include("README.md"), no_overwrite()),
+            "license.md": (template("license"), no_overwrite()),
+            "authors.md": (default_myst_include("AUTHORS.md"), no_overwrite()),
+            "changelog.md": (default_myst_include("CHANGELOG.md"), no_overwrite()),
         },
     }
 
@@ -157,67 +158,3 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
 
 def is_commented(line):
     return line.strip().startswith("#")
-
-
-def symlink(original_file: fs.PathLike) -> FileOp:
-    """Returns a file operation that creates a symlink to ``original_file``."""
-    # TODO: Transfer this function to PyScaffold's core (and split it into 2:
-    #       a file_system.symlink and an operations.symlink)
-
-    def _symlink(path: Path, _: FileContents, opts: ScaffoldOpts):
-        """See ``pyscaffoldext.markdown.extension.symlink``"""
-        should_pretend = opts.get("pretend")
-        should_log = opts.get("log", should_pretend)
-        # ^ When pretending, automatically output logs
-        #   (after all, this is the primary purpose of pretending)
-
-        if should_log:
-            logger.report("symlink", path, target=original_file)
-
-        if should_pretend:
-            return path
-
-        # Since errors in Windows can be tricky, let's print meaningful messages
-        if path.exists():
-            if opts.get("force"):
-                path.unlink()
-            else:
-                raise FileExistsError(
-                    "Impossible to create a symbolic link "
-                    f"{{{path} => {original_file}}}.\n{path} already exist.\n"
-                )
-
-        if not Path(original_file).exists():
-            raise FileNotFoundError(
-                "Impossible to create a symbolic link "
-                f"{{{path} => {original_file}}}: {original_file} does not exist"
-            )
-
-        try:
-            # Relative links in Python might be tricky
-            # the following implementation is very difficult to be replaced by something
-            # completely pathlib-based, see https://bugs.python.org/issue37019
-            os.symlink(os.path.relpath(original_file, path.parent), path)
-            return path
-        except OSError as ex:
-            raise SymlinkError(path, original_file) from ex
-
-    return _symlink
-
-
-class SymlinkError(OSError):
-    """\
-    Impossible to create a symbolic link {{{link_path} => {original_file}}}.
-    If you are using a non-POSIX operating system, please make sure that your user have
-    the correct rights and that your system is correctly configured.
-
-    Please check the following references:
-    http://github.com/git-for-windows/git/wiki/Symbolic-Links
-    https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/
-    https://docs.microsoft.com/en-us/windows/win32/fileio/creating-symbolic-links
-    """
-
-    def __init__(self, link_path, original_file, *args, **kwargs):
-        docs = self.__class__.__doc__ or ""
-        msg = docs.format(original_file=original_file, link_path=link_path)
-        super().__init__(msg, *args, **kwargs)
