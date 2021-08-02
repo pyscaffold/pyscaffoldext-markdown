@@ -22,8 +22,8 @@ Module Reference <api/modules>
 * {ref}`modindex`
 * {ref}`search`
 
-[PyScaffold]: http://pyscaffold.org
-[reStructuredText]: http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+[PyScaffold]: https://pyscaffold.org
+[reStructuredText]: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 [Markdown]: https://daringfireball.net/projects/markdown/
 [MyST]: https://myst-parser.readthedocs.io/en/latest/index.html
-[Sphinx]: http://www.sphinx-doc.org/
+[Sphinx]: https://www.sphinx-doc.org/

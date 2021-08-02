@@ -1,5 +1,5 @@
 [![Build Status](https://api.cirrus-ci.com/github/pyscaffold/pyscaffoldext-markdown.svg?branch=master)](https://cirrus-ci.com/github/pyscaffold/pyscaffoldext-markdown)
-[![ReadTheDocs](https://readthedocs.org/projects/pyscaffoldext-markdown/badge/?version=latest)](https://pyscaffoldext-markdown.readthedocs.io/)
+[![ReadTheDocs](https://readthedocs.org/projects/pyscaffoldext-markdown/badge/?version=latest)](https://pyscaffold.org/projects/markdown/en/latest/)
 [![Coveralls](https://img.shields.io/coveralls/github/pyscaffold/pyscaffoldext-markdown/master.svg)](https://coveralls.io/r/pyscaffold/pyscaffoldext-markdown)
 [![PyPI-Server](https://img.shields.io/pypi/v/pyscaffoldext-markdown.svg)](https://pypi.org/project/pyscaffoldext-markdown)
 [![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/pyscaffoldext-markdown.svg)](https://anaconda.org/conda-forge/pyscaffoldext-markdown)
@@ -73,10 +73,10 @@ This project has been set up using PyScaffold 4.0. For details and usage
 information on PyScaffold see [https://pyscaffold.org/](https://pyscaffold.org/).
 
 [PyScaffold]: https://pyscaffold.org
-[reStructuredText]: http://docutils.sourceforge.net/rst.html
+[reStructuredText]: https://docutils.sourceforge.io/docs/user/rst/quickstart.html
 [Markdown]: https://daringfireball.net/projects/markdown/
 [MyST]: https://myst-parser.readthedocs.io/en/latest/index.html
-[Sphinx]: http://www.sphinx-doc.org/
+[Sphinx]: https://www.sphinx-doc.org/
 [WSL]: https://docs.microsoft.com/en-us/windows/wsl/
 [tox]: https://tox.readthedocs.org/
 [pip]: https://pip.pypa.io/en/stable/
@@ -84,5 +84,5 @@ information on PyScaffold see [https://pyscaffold.org/](https://pyscaffold.org/)
 [twine]: https://twine.readthedocs.io/
 [PyPI]: https://pypi.org/
 [Conda-Forge]: https://anaconda.org/conda-forge/pyscaffoldext-markdown
-[pre-commit]: http://pre-commit.com/
+[pre-commit]: https://pre-commit.com/
 [contribution guidelines]: https://pyscaffold.org/en/latest/contributing.html
