@@ -297,4 +297,5 @@ intersphinx_mapping = {
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
+    "rst_to_myst": ("https://rst-to-myst.readthedocs.io/en/stable", None),
 }
