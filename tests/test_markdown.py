@@ -11,10 +11,11 @@ CONV_FILES = [
     "README",
     "AUTHORS",
     "CHANGELOG",
-    "docs/index",
+    "CONTRIBUTING" "docs/index",
     "docs/readme",
     "docs/authors",
     "docs/changelog",
+    "docs/contributing",
 ]
 
 
