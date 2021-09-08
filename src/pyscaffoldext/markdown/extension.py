@@ -10,6 +10,7 @@ from pyscaffold.identification import dasherize
 from pyscaffold.operations import no_overwrite
 from pyscaffold.structure import merge, reify_leaf, reject
 from pyscaffold.templates import get_template
+from rst_to_myst.mdformat_render import rst_to_myst
 
 from . import templates
 
@@ -21,6 +22,13 @@ DESC_KEY = "long_description"
 TYPE_KEY = "long_description_content_type"
 
 DOC_REQUIREMENTS = ["myst-parser[linkify]"]
+
+RST2MYST_OPTS: dict = {}
+"""Options for the automatic conversion between reStructuredText and Markdown
+
+See https://rst-to-myst.readthedocs.io/en/stable/api.html#full-conversion
+"""
+
 
 template = partial(get_template, relative_to=templates)
 
@@ -121,37 +129,48 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
     """Replace all rst files to proper md and activate Sphinx md.
     See :obj:`pyscaffold.actions.Action`
     """
+    # Define new files
+    NO_OVERWRITE = no_overwrite()
+    files: Structure = {
+        "README.md": (template("readme"), NO_OVERWRITE),
+        "AUTHORS.md": (template("authors"), NO_OVERWRITE),
+        "CHANGELOG.md": (template("changelog"), NO_OVERWRITE),
+        "docs": {
+            "index.md": (template("index"), NO_OVERWRITE),
+            "readme.md": (default_myst_include("README.md"), NO_OVERWRITE),
+            "license.md": (template("license"), NO_OVERWRITE),
+            "authors.md": (default_myst_include("AUTHORS.md"), NO_OVERWRITE),
+            "changelog.md": (default_myst_include("CHANGELOG.md"), NO_OVERWRITE),
+            "contributing.md": (default_myst_include("CONTRIBUTING.md"), NO_OVERWRITE),
+        },
+    }
+
+    # Automatically convert RST to MD
+    content, file_op = reify_leaf(struct.get("CONTRIBUTING.rst"), opts)
+    md_content = rst_to_myst(content or "", **RST2MYST_OPTS).text
+    files["CONTRIBUTING.md"] = (md_content, file_op)
+
+    # Modify pre-existing files
+    content, file_op = reify_leaf(struct["setup.cfg"], opts)
+    files["setup.cfg"] = (add_long_desc(content), file_op)
+
+    content, file_op = reify_leaf(struct["docs"]["conf.py"], opts)
+    files["docs"]["conf.py"] = (add_myst(content), file_op)
+
     # Remove all unnecessary .rst files from struct
     unnecessary = [
         "README.rst",
         "AUTHORS.rst",
         "CHANGELOG.rst",
+        "CONTRIBUTING.rst",
         "docs/index.rst",
         "docs/readme.rst",
         "docs/license.rst",
         "docs/authors.rst",
         "docs/changelog.rst",
+        "docs/contributing.rst",
     ]
     struct = reduce(reject, unnecessary, struct)
-    content, file_op = reify_leaf(struct["setup.cfg"], opts)
-    struct["setup.cfg"] = (add_long_desc(content), file_op)
-
-    content, file_op = reify_leaf(struct["docs"]["conf.py"], opts)
-
-    # Define replacement files/links
-    files: Structure = {
-        "README.md": (template("readme"), no_overwrite()),
-        "AUTHORS.md": (template("authors"), no_overwrite()),
-        "CHANGELOG.md": (template("changelog"), no_overwrite()),
-        "docs": {
-            "conf.py": (add_myst(content), file_op),
-            "index.md": (template("index"), no_overwrite()),
-            "readme.md": (default_myst_include("README.md"), no_overwrite()),
-            "license.md": (template("license"), no_overwrite()),
-            "authors.md": (default_myst_include("AUTHORS.md"), no_overwrite()),
-            "changelog.md": (default_myst_include("CHANGELOG.md"), no_overwrite()),
-        },
-    }
 
     return merge(struct, files), opts
 
