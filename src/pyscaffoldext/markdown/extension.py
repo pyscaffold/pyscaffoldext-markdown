@@ -10,7 +10,6 @@ from pyscaffold.identification import dasherize
 from pyscaffold.operations import no_overwrite
 from pyscaffold.structure import merge, reify_leaf, reject
 from pyscaffold.templates import get_template
-from rst_to_myst.mdformat_render import rst_to_myst
 
 from . import templates
 
@@ -22,12 +21,6 @@ DESC_KEY = "long_description"
 TYPE_KEY = "long_description_content_type"
 
 DOC_REQUIREMENTS = ["myst-parser[linkify]"]
-
-RST2MYST_OPTS: dict = {}
-"""Options for the automatic conversion between reStructuredText and Markdown
-
-See https://rst-to-myst.readthedocs.io/en/stable/api.html#full-conversion
-"""
 
 
 template = partial(get_template, relative_to=templates)
@@ -135,6 +128,7 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         "README.md": (template("readme"), NO_OVERWRITE),
         "AUTHORS.md": (template("authors"), NO_OVERWRITE),
         "CHANGELOG.md": (template("changelog"), NO_OVERWRITE),
+        "CONTRIBUTING.md": (template("contributing"), NO_OVERWRITE),
         "docs": {
             "index.md": (template("index"), NO_OVERWRITE),
             "readme.md": (default_myst_include("README.md"), NO_OVERWRITE),
@@ -145,10 +139,14 @@ def replace_files(struct: Structure, opts: ScaffoldOpts) -> ActionParams:
         },
     }
 
-    # Automatically convert RST to MD
-    content, file_op = reify_leaf(struct.get("CONTRIBUTING.rst"), opts)
-    md_content = rst_to_myst(content or "", **RST2MYST_OPTS).text
-    files["CONTRIBUTING.md"] = (md_content, file_op)
+    # TODO: Automatically convert RST to MD
+    #
+    # >>> content, file_op = reify_leaf(struct.get("CONTRIBUTING.rst"), opts)
+    # >>> md_content = rst_to_myst(content or "", **RST2MYST_OPTS).text
+    # >>> files["CONTRIBUTING.md"] = (md_content, file_op)
+    #
+    # Currently there is a problem in rst-to-myst, preventing automatic conversion:
+    # https://github.com/executablebooks/rst-to-myst/issues/33#issuecomment-922264030
 
     # Modify pre-existing files
     content, file_op = reify_leaf(struct["setup.cfg"], opts)
