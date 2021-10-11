@@ -134,8 +134,8 @@ source <PATH TO VENV>/bin/activate
 or [Miniconda]:
 
 ```
-conda create -n pyscaffold python=3 six virtualenv pytest pytest-cov
-conda activate pyscaffold
+conda create -n ${name} python=3 six virtualenv pytest pytest-cov
+conda activate ${name}
 ```
 
 ### Clone the repository
