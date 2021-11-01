@@ -158,7 +158,7 @@ conda activate ${name}
    pip install -U pip setuptools -e .
    ```
 
-   to be able run `putup --help`.
+   to be able to import the package under development in the Python REPL.
 
    ```{todo} if you are not using pre-commit, please remove the following item:
    ```
@@ -181,7 +181,7 @@ conda activate ${name}
    git checkout -b my-feature
    ```
 
-   and start making changes. Never work on the master branch!
+   and start making changes. Never work on the main branch!
 
 2. Start your work on this branch. Don't forget to add [docstrings] to new
    functions, modules and classes, especially if they are part of public APIs.
