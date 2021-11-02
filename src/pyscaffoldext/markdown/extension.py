@@ -3,7 +3,7 @@ from functools import partial, reduce
 from textwrap import dedent
 from typing import List
 
-from configupdater import ConfigUpdater
+from configupdater import ConfigUpdater, Option
 from pyscaffold.actions import Action, ActionParams, ScaffoldOpts, Structure
 from pyscaffold.extensions import Extension
 from pyscaffold.identification import dasherize
@@ -40,7 +40,9 @@ def add_long_desc(content: str) -> str:
     updater.read_string(content)
     metadata = updater["metadata"]
 
-    long_desc = metadata.get(dasherize(DESC_KEY)) or metadata.get(DESC_KEY)
+    dash_key = dasherize(DESC_KEY)
+    default = Option(DESC_KEY)
+    long_desc = metadata.get(dash_key) or metadata.setdefault(DESC_KEY, default)
     long_desc.key = DESC_KEY  # dash-separated keys are deprecated in setuptools
     long_desc.value = "file: README.md"
     long_desc_value = "text/markdown; charset=UTF-8; variant=GFM"
