@@ -183,9 +183,9 @@ windows_task:
 
 
 coverage_task:
-  name: coverage (Linux - 3.6)
+  name: coverage (Linux - 3.8)
   clone_script: *clone
-  container: {image: "python:3.6-buster"}
+  container: {image: "python:3.8-buster"}
   env:
     COVERAGE: yes
   depends_on:
