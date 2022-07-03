@@ -1,6 +1,13 @@
 # Changelog
 
-<!-- ## Version 0.4.2 (development) -->
+<!-- ## Version 0.5.1 (development) -->
+
+## Version 0.5
+
+* Switch to [`myst-parser`](https://pypi.org/project/myst-parser/) from `recommonmark`, PR #16
+* Added badges to the `README.md` template, PR #21
+* Remove description section in `README.md`, PR #39
+* Add a static `CONTRIBUTING.md` template, PR #27
 
 ## Version 0.4.1
 
