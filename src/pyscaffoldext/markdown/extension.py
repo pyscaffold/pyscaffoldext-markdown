@@ -73,8 +73,8 @@ def add_myst(original: str) -> str:
 def default_myst_include(root_file: str) -> str:
     """Return string which is a MyST include directive pointing to `root_file`,
     located under `..` relative to `docs`. See:
-    https://myst-parser.readthedocs.io/en/latest/sphinx/use.html#howto-include-readme
-    """
+    https://myst-parser.readthedocs.io/en/latest/faq/index.html#include-a-file-from-outside-the-docs-folder-like-readme-md
+    """  # noqa
     template_include = dedent(
         """\
         ```{include} ../{root_file}
