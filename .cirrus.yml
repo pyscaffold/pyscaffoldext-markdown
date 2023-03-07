@@ -93,8 +93,10 @@ linux_mac_task:
     - name: test (Linux - 3.9)
       container: {image: "python:3.9-buster"}
     - name: test (Linux - 3.10)
-      allow_failures: true  # Some packages (e.g. Sphinx) might still have some problems
       container: {image: "python:3.10-buster"}
+    - name: test (Linux - 3.11)
+      allow_failures: true  # Some packages (e.g. Sphinx) might still have some problems
+      container: {image: "python:3.11-rc-buster"}
     - name: test (Linux - Anaconda)
       container: {image: "continuumio/anaconda3:2021.05"}
       env:
@@ -189,9 +191,10 @@ coverage_task:
   env:
     COVERAGE: yes
   depends_on:
-    - test (Linux - 3.6)
     - test (Linux - 3.7)
     - test (Linux - 3.8)
+    - test (Linux - 3.9)
+    - test (Linux - 3.10)
     - test (Linux - Anaconda)
     - test (OS X)
   pip_install_script:
