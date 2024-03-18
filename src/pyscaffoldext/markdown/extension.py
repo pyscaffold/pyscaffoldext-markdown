@@ -1,4 +1,5 @@
 """Extension that replaces reStructuredText by Markdown"""
+
 from functools import partial, reduce
 from textwrap import dedent
 from typing import List
