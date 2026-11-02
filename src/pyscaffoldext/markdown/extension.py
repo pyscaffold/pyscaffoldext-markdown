@@ -1,4 +1,5 @@
 """Extension that replaces reStructuredText by Markdown"""
+
 from functools import partial, reduce
 from textwrap import dedent
 from typing import List
@@ -75,14 +76,12 @@ def default_myst_include(root_file: str) -> str:
     located under `..` relative to `docs`. See:
     https://myst-parser.readthedocs.io/en/latest/faq/index.html#include-a-file-from-outside-the-docs-folder-like-readme-md
     """  # noqa
-    template_include = dedent(
-        """\
+    template_include = dedent("""\
         ```{include} ../{root_file}
         :relative-docs: docs/
         :relative-images:
         ```
-        """
-    )
+        """)
     return template_include.replace("{root_file}", root_file)
 
 
